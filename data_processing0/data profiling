@@ -1,0 +1,46 @@
+from ydata_profiling import ProfileReport
+import pandas as pd
+import json
+
+submissions = pd.read_csv("C:/Users/dbhal/Documents/Gianella/pds_opinions/data/submissions_with_deltas.csv")
+comments = pd.read_csv("C:/Users/dbhal/Documents/Gianella/pds_opinions/data/comments_from_submissions_with_deltas.csv")
+
+
+# Preapare submissions table to merge with comments
+submissions['created_at'] = pd.to_datetime(submissions['created_at'], format='ISO8601')
+submissions.drop(columns={'has_delta'}, inplace=True)
+
+def parse_json_field(json_str):
+    try:
+        # Convert string to a dictionary and return the first value
+        return list(json.loads(json_str).values())[0]
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return None  # Return None if parsing fails
+
+# Date Time
+from tomlkit import comment
+
+comments['created_at'] = pd.to_datetime(comments['created_at'], errors='coerce')
+submissions['created_at'] = pd.to_datetime(submissions['created_at'], errors='coerce')
+
+# Create simplified version without seconds
+comments['simplified_created_at'] = pd.to_datetime(comments['created_at'].dt.strftime('%Y-%m-%d %H:%M'))
+submissions['simplified_created_at'] = pd.to_datetime(submissions['created_at'].dt.strftime('%Y-%m-%d %H:%M'))
+
+comments['edited'] = comments['edited'].astype('bool')
+submissions['edited'] = submissions['edited'].astype('bool')
+
+#Parse JSON
+comments['score'] = comments['score'].apply(parse_json_field)
+submissions['score'] = submissions['score'].apply(parse_json_field)
+submissions['upvote_ratio'] = submissions['upvote_ratio'].apply(parse_json_field)
+submissions['num_comments'] = submissions['num_comments'].apply(parse_json_field)
+
+reddit_data=pd.merge(submissions, comments, right_on='link_id', left_on='submission_id' )
+
+# Create a profile report
+profile = ProfileReport(reddit_data, title="Reddit Data Profiling Report", explorative=True)
+
+profile.to_notebook_iframe()
+
+profile.to_file("reddit_data_profile.html")
