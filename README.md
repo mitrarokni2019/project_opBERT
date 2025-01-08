@@ -6,8 +6,7 @@ Social media significantly shapes public opinion on critical issues such as clim
 
 Specifically, this research explores two approaches to analyzing comments:
 
-1. **Categorizing comments based on ten social intent (dimensions)**:  
-   - "knowledge", "trust", "similarity", "power", "status", "support", "romance", "identity", "fun", "conflict".  
+1. **Categorizing comments based on ten social intent (dimensions)**: "knowledge", "trust", "similarity", "power", "status", "support", "romance", "identity", "fun", "conflict".  
    - **LSTM (Long Short-Term Memory)** networks for sequence classification: [tendimensions GitHub](https://github.com/lajello/tendimensions).  
    - **Zero-shot classification** using **BERT** (Hugging Face transformers) for classification without needing labeled data.
 
